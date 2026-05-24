@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GlowMart - Skincare Premium</title>
+    
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --primary: #C7D7C8; /* Sage Green */
+            --primary-dark: #A8B8A9;
+            --accent: #FADADD; /* Soft Pink */
+            --accent-dark: #E8B8BC;
+            --text: #333333;
+            --text-light: #666666;
+            --bg: #FFFFFF;
+            --bg-gray: #F9F9F9;
+            --danger: #ff6b6b;
+            --success: #51cf66;
+            --shadow: 0 4px 15px rgba(0,0,0,0.05);
+            --radius: 12px;
+            --nav-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-gray); color: var(--text); padding-bottom: 80px; }
+        
+        /* --- UTILITIES --- */
+        .container { max-width: 480px; margin: 0 auto; padding: 20px; min-height: 100vh; background: var(--bg); position: relative; }
+        .hidden { display: none !important; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 0.5rem; } .gap-4 { gap: 1rem; }
+        .w-full { width: 100%; }
+        .text-center { text-align: center; }
+        .text-sm { font-size: 0.875rem; }
+        .text-xs { font-size: 0.75rem; }
+        .font-bold { font-weight: 600; }
+        .mt-4 { margin-top: 1rem; } .mb-4 { margin-bottom: 1rem; }
+        
+        /* --- COMPONENTS --- */
+        .btn {
+            background: var(--primary); color: var(--text); border: none; padding: 12px 20px;
+            border-radius: var(--radius); font-weight: 600; cursor: pointer; width: 100%;
+            transition: 0.2s; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn-secondary { background: #eee; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); }
+        
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; font-size: 0.9rem; margin-bottom: 5px; color: var(--text-light); }
+        .input-field {
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: var(--radius);
+            font-family: inherit; font-size: 1rem; outline: none; transition: 0.2s;
+        }
+        .input-field:focus { border-color: var(--primary); }
+
+        /* --- HEADER --- */
+        header { position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 15px 0; border-bottom: 1px solid #eee; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--text); }
+        .logo span { color: var(--primary-dark); }
+        .cart-icon { position: relative; cursor: pointer; }
+        .badge { position: absolute; top: -5px; right: -5px; background: var(--accent-dark); color: var(--text); font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; font-weight: bold; }
+
+        /* --- PRODUCT LIST --- */
+        .filters { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; scrollbar-width: none; }
+        .filter-chip { 
+            padding: 6px 16px; background: white; border: 1px solid #eee; border-radius: 20px; 
+            white-space: nowrap; font-size: 0.9rem; cursor: pointer; transition: 0.2s;
+        }
+        .filter-chip.active { background: var(--primary); border-color: var(--primary); color: var(--text); }
+        
+        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .product-card { background: white; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); border: 1px solid transparent; transition: 0.2s; }
+        .product-card:active { transform: scale(0.98); }
+        .product-img { width: 100%; height: 150px; object-fit: cover; background: #eee; }
+        .product-info { padding: 10px; }
+        .product-name { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-price { color: var(--text-light); font-size: 0.9rem; }
+        .product-cat { font-size: 0.7rem; color: var(--primary-dark); background: var(--primary); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 4px; }
+
+        /* --- CART --- */
+        .cart-item { display: flex; gap: 15px; padding: 15px 0; border-bottom: 1px solid #eee; }
+        .cart-img { width: 70px; height: 70px; border-radius: 8px; object-fit: cover; }
+        .cart-details { flex: 1; }
+        .qty-control { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+        .qty-btn { width: 25px; height: 25px; border-radius: 50%; border: 1px solid #ddd; background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+        /* --- TOAST --- */
+        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; }
+        .toast { background: var(--text); color: white; padding: 12px 20px; border-radius: 8px; font-size: 0.9rem; box-shadow: 0 5px 15px rgba(0,0,0,0.2); animation: slideDown 0.3s ease; display: flex; align-items: center; justify-content: space-between; }
+        .toast.success { background: var(--primary-dark); }
+        .toast.error { background: var(--danger); }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* --- MODAL --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 50; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal { background: white; width: 90%; max-width: 400px; border-radius: var(--radius); padding: 20px; transform: scale(0.9); transition: 0.3s; max-height: 90vh; overflow-y: auto; }
+        .modal-overlay.active .modal { transform: scale(1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-modal { cursor: pointer; }
+
+        /* --- ADMIN PANEL --- */
+        .admin-tabs { display: flex; margin-bottom: 20px; background: #eee; border-radius: 8px; padding: 4px; }
+        .admin-tab { flex: 1; text-align: center; padding: 8px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+        .admin-tab.active { background: white; font-weight: 600; shadow: var(--shadow); }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .data-table th, .data-table td { text-align: left; padding: 8px; border-bottom: 1px solid #eee; }
+        .data-table th { color: var(--text-light); font-weight: 500; }
+        
+        /* --- PAYMENT MOCK --- */
+        .payment-option { border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .payment-option.selected { border-color: var(--primary); background: #f0fdf4; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="container header-content" style="padding: 0 20px; min-height: auto;">
+                <div class="logo">Glow<span>Mart</span></div>
+                <div class="flex items-center gap-4">
+                    <div class="cart-icon" onclick="app.router.navigate('cart')">
+                        <i data-lucide="shopping-bag"></i>
+                        <div id="cart-badge" class="badge hidden">0</div>
+                    </div>
+                    <div class="cart-icon" onclick="app.router.navigate('account')">
+                        <i data-lucide="user"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- TOASTS -->
+        <div id="toast-container"></div>
+
+        <!-- VIEWS -->
+        <main id="main-content">
+            <!-- 1. HOME VIEW -->
+            <section id="view-home" class="view-section">
+                <div class="input-group" style="margin-top: 15px;">
+                    <input type="text" id="search-input" class="input-field" placeholder="Cari produk skincare...">
+                </div>
+                
+                <div class="filters" id="category-filters">
+                    <button class="filter-chip active" data-cat="all">Semua</button>
+                    <button class="filter-chip" data-cat="Face Wash">Face Wash</button>
+                    <button class="filter-chip" data-cat="Serum">Serum</button>
+                    <button class="filter-chip" data-cat="Moisturizer">Moisturizer</button>
+                    <button class="filter-chip" data-cat="Sunscreen">Sunscreen</button>
+                </div>
+
+                <div class="product-grid" id="product-list">
+                    <!-- Products injected here -->
+                </div>
+            </section>
+
+            <!-- 2. CART VIEW -->
+            <section id="view-cart" class="view-section hidden">
+                <h2 class="font-bold" style="margin-bottom: 20px;">Keranjang Belanja</h2>
+                <div id="cart-items-container">
+                    <!-- Cart items injected here -->
+                </div>
+                <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;">
+                    <div class="flex justify-between font-bold" style="margin-bottom: 20px;">
+                        <span>Subtotal</span>
+                        <span id="cart-total">Rp 0</span>
+                    </div>
+                    <button class="btn" onclick="app.router.navigate('checkout')">
+                        Lanjut ke Checkout <i data-lucide="arrow-right" style="width: 18px;"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- 3. CHECKOUT VIEW -->
+            <section id="view-checkout" class="view-section hidden">
+                <h2 class="font-bold mb-4">Checkout</h2>
+                <form id="checkout-form" onsubmit="app.handleCheckout(event)">
+                    <div class="input-group">
+                        <label>Nama Lengkap</label>
+                        <input type="text" id="co-name" class="input-field" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Nomor WhatsApp</label>
+                        <input type="tel" id="co-phone" class="input-field" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Alamat Lengkap</label>
+                        <textarea id="co-address" class="input-field" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Pilih Kurir</label>
+                        <select id="co-courier" class="input-field" onchange="app.updateShippingCost()">
+                            <option value="">-- Pilih Kurir --</option>
+                            <option value="JNE">JNE (Rp 20.000)</option>
+                            <option value="J&T">J&T (Rp 22.000)</option>
+                            <option value="SiCepat">SiCepat (Rp 25.000)</option>
+                        </select>
+                    </div>
+
+                    <div class="flex justify-between text-sm mb-4">
+                        <span>Subtotal Produk</span>
+                        <span id="co-subtotal">Rp 0</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-4">
+                        <span>Ongkos Kirim</span>
+                        <span id="co-shipping">Rp 0</span>
+                    </div>
+                    <div class="flex justify-between font-bold mb-4" style="font-size: 1.1rem; border-top: 1px dashed #ccc; padding-top: 10px;">
+                        <span>Total Bayar</span>
+                        <span id="co-total" style="color: var(--primary-dark);">Rp 0</span>
+                    </div>
+
+                    <button type="submit" class="btn">Bayar Sekarang</button>
+                </form>
+            </section>
+
+            <!-- 4. ACCOUNT / AUTH VIEW -->
+            <section id="view-account" class="view-section hidden">
+                <!-- Not Logged In -->
+                <div id="auth-forms">
+                    <div id="login-form">
+                        <h2 class="font-bold mb-4 text-center">Masuk</h2>
+                        <form onsubmit="app.auth.login(event)">
+                            <div class="input-group">
+                                <label>Email</label>
+                                <input type="email" name="email" class="input-field" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Password</label>
+                                <input type="password" name="password" class="input-field" required>
+                            </div>
+                            <button type="submit" class="btn mb-4">Login</button>
+                            <p class="text-center text-sm">Belum punya akun? <a href="#" onclick="app.auth.toggleForm()" style="color: var(--primary-dark);">Daftar</a></p>
+                        </form>
+                    </div>
+
+                    <div id="register-form" class="hidden">
+                        <h2 class="font-bold mb-4 text-center">Daftar</h2>
+                        <form onsubmit="app.auth.register(event)">
+                            <div class="input-group">
+                                <label>Nama</label>
+                                <input type="text" name="name" class="input-field" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Email</label>
+                                <input type="email" name="email" class="input-field" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Password</label>
+                                <input type="password" name="password" class="input-field" required>
+                            </div>
+                            <button type="submit" class="btn mb-4">Daftar</button>
+                            <p class="text-center text-sm">Sudah punya akun? <a href="#" onclick="app.auth.toggleForm()" style="color: var(--primary-dark);">Login</a></p>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Logged In -->
+                <div id="user-dashboard" class="hidden">
+                    <div class="text-center mb-4">
+                        <div style="width: 80px; height: 80px; background: var(--accent); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; color: var(--text);">
+                            <span id="user-avatar">U</span>
+                        </div>
+                        <h2 class="font-bold" id="user-name-display">User Name</h2>
+                        <p class="text-sm text-light" id="user-email-display">user@email.com</p>
+                        <button class="btn btn-secondary mt-4 text-sm" onclick="app.auth.logout()">Logout</button>
+                    </div>
+
+                    <h3 class="font-bold mb-4" style="border-bottom: 1px solid #eee; padding-bottom: 10px;">Riwayat Pesanan</h3>
+                    <div id="order-history-list">
+                        <!-- Orders injected here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. ADMIN PANEL VIEW -->
+            <section id="view-admin" class="view-section hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="font-bold">Admin Panel</h2>
+                    <button class="btn btn-secondary text-sm" style="width: auto;" onclick="app.auth.logout()">Logout Admin</button>
+                </div>
+                
+                <div class="admin-tabs">
+                    <div class="admin-tab active" onclick="app.admin.switchTab('products')">Produk</div>
+                    <div class="admin-tab" onclick="app.admin.switchTab('orders')">Pesanan</div>
+                </div>
+
+                <!-- Admin Products -->
+                <div id="admin-products-tab">
+                    <button class="btn btn-secondary mb-4" onclick="app.admin.openProductModal()">+ Tambah Produk</button>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead><tr><th>Produk</th><th>Harga</th><th>Stok</th><th>Aksi</th></tr></thead>
+                            <tbody id="admin-product-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Admin Orders -->
+                <div id="admin-orders-tab" class="hidden">
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead><tr><th>ID</th><th>User</th><th>Total</th><th>Status</th><th>Aksi</th></tr></thead>
+                            <tbody id="admin-order-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL: PRODUCT FORM (ADMIN) -->
+    <div id="modal-product" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="font-bold" id="modal-product-title">Tambah Produk</h3>
+                <i data-lucide="x" class="close-modal" onclick="app.ui.closeModal('modal-product')"></i>
+            </div>
+            <form onsubmit="app.admin.saveProduct(event)">
+                <input type="hidden" id="p-id">
+                <div class="input-group">
+                    <label>Nama Produk</label>
+                    <input type="text" id="p-name" class="input-field" required>
+                </div>
+                <div class="input-group">
+                    <label>Kategori</label>
+                    <select id="p-cat" class="input-field">
+                        <option>Face Wash</option><option>Serum</option><option>Moisturizer</option><option>Sunscreen</option>
+                    </select>
+                </div>
+                <div class="flex gap-4">
+                    <div class="input-group w-full">
+                        <label>Harga</label>
+                        <input type="number" id="p-price" class="input-field" required>
+                    </div>
+                    <div class="input-group w-full">
+                        <label>Stok</label>
+                        <input type="number" id="p-stock" class="input-field" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn">Simpan</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: MIDTRANS SIMULATION -->
+    <div id="modal-payment" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="font-bold">Midtrans Snap (Demo)</h3>
+                <i data-lucide="x" class="close-modal" onclick="app.ui.closeModal('modal-payment')"></i>
+            </div>
+            <div id="payment-loading" class="text-center hidden">
+                <i data-lucide="loader-2" class="animate-spin" style="width: 40px; height: 40px; color: var(--primary); margin: 0 auto;"></i>
+                <p class="mt-4">Memproses Pembayaran...</p>
+            </div>
+            <div id="payment-methods">
+                <p class="text-sm mb-4">Pilih metode pembayaran untuk <b id="pay-amount"></b>:</p>
+                <div class="payment-option" onclick="app.payment.process('BCA VA')">
+                    <i data-lucide="credit-card"></i> <span>BCA Virtual Account</span>
+                </div>
+                <div class="payment-option" onclick="app.payment.process('GoPay')">
+                    <i data-lucide="smartphone"></i> <span>GoPay / QRIS</span>
+                </div>
+                <div class="payment-option" onclick="app.payment.process('ShopeePay')">
+                    <i data-lucide="shopping-cart"></i> <span>ShopeePay</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- 1. MOCK BACKEND & DATA ---
+        const DB_KEYS = { PRODUCTS: 'gm_products', USERS: 'gm_users', ORDERS: 'gm_orders', SESSION: 'gm_session' };
+
+        const dummyProducts = [
+            { id: 1, name: "GlowBeam Serum", category: "Serum", price: 150000, stock: 25, image: "https://picsum.photos/seed/serum1/300/300" },
+            { id: 2, name: "SoftTouch Moist", category: "Moisturizer", price: 95000, stock: 40, image: "https://picsum.photos/seed/moist1/300/300" },
+            { id: 3, name: "PureClean Wash", category: "Face Wash", price: 45000, stock: 50, image: "https://picsum.photos/seed/wash1/300/300" },
+            { id: 4, name: "SunGuard SPF50", category: "Sunscreen", price: 120000, stock: 15, image: "https://picsum.photos/seed/sun1/300/300" },
+            { id: 5, name: "NightRepair Oil", category: "Serum", price: 180000, stock: 10, image: "https://picsum.photos/seed/oil1/300/300" }
+        ];
+
+        class Database {
+            constructor() {
+                this.init();
+            }
+            init() {
+                if (!localStorage.getItem(DB_KEYS.PRODUCTS)) localStorage.setItem(DB_KEYS.PRODUCTS, JSON.stringify(dummyProducts));
+                if (!localStorage.getItem(DB_KEYS.USERS)) localStorage.setItem(DB_KEYS.USERS, JSON.stringify([]));
+                if (!localStorage.getItem(DB_KEYS.ORDERS)) localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify([]));
+            }
+            get(key) { return JSON.parse(localStorage.getItem(key)); }
+            save(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+            addProduct(product) { 
+                const list = this.get(DB_KEYS.PRODUCTS);
+                product.id = Date.now(); 
+                product.image = `https://picsum.photos/seed/${product.id}/300/300`;
+                list.push(product); 
+                this.save(DB_KEYS.PRODUCTS, list); 
+            }
+            updateProduct(product) {
+                let list = this.get(DB_KEYS.PRODUCTS);
+                list = list.map(p => p.id == product.id ? product : p);
+                this.save(DB_KEYS.PRODUCTS, list);
+            }
+            deleteProduct(id) {
+                let list = this.get(DB_KEYS.PRODUCTS);
+                list = list.filter(p => p.id != id);
+                this.save(DB_KEYS.PRODUCTS, list);
+            }
+            createOrder(order) {
+                const list = this.get(DB_KEYS.ORDERS);
+                order.id = 'ORD-' + Date.now();
+                order.status = 'pending';
+                order.date = new Date().toISOString();
+                list.unshift(order); // Add to top
+                this.save(DB_KEYS.ORDERS, list);
+                return order;
+            }
+            updateOrderStatus(id, status) {
+                let list = this.get(DB_KEYS.ORDERS);
+                list = list.map(o => o.id === id ? {...o, status} : o);
+                this.save(DB_KEYS.ORDERS, list);
+            }
+        }
+        const db = new Database();
+
+        // --- 2. APP CONTROLLER ---
+        const app = {
+            state: {
+                cart: JSON.parse(localStorage.getItem('gm_cart')) || [],
+                user: JSON.parse(localStorage.getItem(DB_KEYS.SESSION)) || null,
+                currentCategory: 'all',
+                searchQuery: ''
+            },
+
+            init: () => {
+                app.renderProducts();
+                app.updateCartBadge();
+                app.router.init();
+                lucide.createIcons();
+                
+                // Search Listener
+                document.getElementById('search-input').addEventListener('input', (e) => {
+                    app.state.searchQuery = e.target.value.toLowerCase();
+                    app.renderProducts();
+                });
+
+                // Filter Listeners
+                document.querySelectorAll('.filter-chip').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        app.state.currentCategory = btn.dataset.cat;
+                        app.renderProducts();
+                    });
+                });
+            },
+
+            // --- LOGIC: PRODUCTS ---
+            renderProducts: () => {
+                const list = db.get(DB_KEYS.PRODUCTS);
+                const filtered = list.filter(p => {
+                    const matchCat = app.state.currentCategory === 'all' || p.category === app.state.currentCategory;
+                    const matchName = p.name.toLowerCase().includes(app.state.searchQuery);
+                    return matchCat && matchName;
+                });
+
+                const container = document.getElementById('product-list');
+                container.innerHTML = filtered.map(p => `
+                    <div class="product-card" onclick="app.addToCart(${p.id})">
+                        <img src="${p.image}" class="product-img" alt="${p.name}">
+                        <div class="product-info">
+                            <span class="product-cat">${p.category}</span>
+                            <div class="product-name">${p.name}</div>
+                            <div class="product-price">Rp ${p.price.toLocaleString('id-ID')}</div>
+                            <div class="text-xs text-light mt-4">Stok: ${p.stock}</div>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            // --- LOGIC: CART ---
+            addToCart: (id) => {
+                const product = db.get(DB_KEYS.PRODUCTS).find(p => p.id === id);
+                const existing = app.state.cart.find(i => i.id === id);
+                
+                if (existing) {
+                    if(existing.qty < product.stock) {
+                        existing.qty++;
+                        app.ui.toast('Jumlah produk diperbarui');
+                    } else {
+                        app.ui.toast('Stok maksimum tercapai', 'error');
+                        return;
+                    }
+                } else {
+                    app.state.cart.push({ ...product, qty: 1 });
+                    app.ui.toast('Masuk keranjang');
+                }
+                app.saveCart();
+            },
+            
+            updateCartQty: (id, delta) => {
+                const item = app.state.cart.find(i => i.id === id);
+                const product = db.get(DB_KEYS.PRODUCTS).find(p => p.id === id);
+                
+                if (item) {
+                    const newQty = item.qty + delta;
+                    if (newQty > 0 && newQty <= product.stock) {
+                        item.qty = newQty;
+                    } else if (newQty <= 0) {
+                        app.state.cart = app.state.cart.filter(i => i.id !== id);
+                    } else {
+                        app.ui.toast('Stok tidak cukup', 'error');
+                    }
+                }
+                app.saveCart();
+            },
+
+            saveCart: () => {
+                localStorage.setItem('gm_cart', JSON.stringify(app.state.cart));
+                app.updateCartBadge();
+                app.renderCartItems();
+            },
+
+            updateCartBadge: () => {
+                const count = app.state.cart.reduce((acc, item) => acc + item.qty, 0);
+                const badge = document.getElementById('cart-badge');
+                badge.innerText = count;
+                badge.classList.toggle('hidden', count === 0);
+            },
+
+            renderCartItems: () => {
+                const container = document.getElementById('cart-items-container');
+                if (app.state.cart.length === 0) {
+                    container.innerHTML = '<p class="text-center text-light" style="margin-top:50px;">Keranjang kosong</p>';
+                    document.getElementById('cart-total').innerText = 'Rp 0';
+                    return;
+                }
+                
+                let total = 0;
+                container.innerHTML = app.state.cart.map(item => {
+                    total += item.price * item.qty;
+                    return `
+                    <div class="cart-item">
+                        <img src="${item.image}" class="cart-img">
+                        <div class="cart-details">
+                            <div class="font-bold text-sm">${item.name}</div>
+                            <div class="text-sm">Rp ${item.price.toLocaleString('id-ID')}</div>
+                            <div class="qty-control">
+                                <div class="qty-btn" onclick="app.updateCartQty(${item.id}, -1)">-</div>
+                                <span class="text-sm font-bold">${item.qty}</span>
+                                <div class="qty-btn" onclick="app.updateCartQty(${item.id}, 1)">+</div>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+                document.getElementById('cart-total').innerText = 'Rp ' + total.toLocaleString('id-ID');
+            },
+
+            // --- LOGIC: CHECKOUT & PAYMENT ---
+            updateShippingCost: () => {
+                const courier = document.getElementById('co-courier').value;
+                const rates = { 'JNE': 20000, 'J&T': 22000, 'SiCepat': 25000 };
+                const cost = rates[courier] || 0;
+                const subtotal = app.state.cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+                
+                document.getElementById('co-shipping').innerText = 'Rp ' + cost.toLocaleString('id-ID');
+                document.getElementById('co-total').innerText = 'Rp ' + (subtotal + cost).toLocaleString('id-ID');
+            },
+
+            handleCheckout: (e) => {
+                e.preventDefault();
+                if (!app.state.user) {
+                    app.ui.toast('Silakan login terlebih dahulu', 'error');
+                    app.router.navigate('account');
+                    return;
+                }
+                const courier = document.getElementById('co-courier').value;
+                if (!courier) return app.ui.toast('Pilih kurir', 'error');
+
+                const subtotal = app.state.cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+                const shipping = parseInt(document.getElementById('co-shipping').innerText.replace(/\D/g,''));
+                const total = subtotal + shipping;
+
+                app.state.pendingOrder = {
+                    userId: app.state.user.email,
+                    customer: { name: document.getElementById('co-name').value, phone: document.getElementById('co-phone').value, address: document.getElementById('co-address').value },
+                    items: [...app.state.cart],
+                    courier, subtotal, shipping, total
+                };
+
+                document.getElementById('pay-amount').innerText = 'Rp ' + total.toLocaleString('id-ID');
+                app.ui.openModal('modal-payment');
+            },
+
+            payment: {
+                process: (method) => {
+                    document.getElementById('payment-methods').classList.add('hidden');
+                    document.getElementById('payment-loading').classList.remove('hidden');
+                    
+                    // Simulate API call delay
+                    setTimeout(() => {
+                        const order = db.createOrder(app.state.pendingOrder);
+                        app.state.cart = [];
+                        app.saveCart();
+                        app.ui.closeModal('modal-payment');
+                        
+                        // Reset payment UI
+                        document.getElementById('payment-methods').classList.remove('hidden');
+                        document.getElementById('payment-loading').classList.add('hidden');
+
+                        // Reduce Stock
+                        order.items.forEach(item => {
+                            const p = db.get(DB_KEYS.PRODUCTS).find(prod => prod.id === item.id);
+                            if(p) { p.stock -= item.qty; db.updateProduct(p); }
+                        });
+                        
+                        app.ui.toast('Pembayaran Berhasil!', 'success');
+                        app.router.navigate('account');
+                        app.renderOrderHistory();
+                    }, 2000);
+                }
+            },
+
+            // --- LOGIC: AUTH ---
+            auth: {
+                toggleForm: () => {
+                    document.getElementById('login-form').classList.toggle('hidden');
+                    document.getElementById('register-form').classList.toggle('hidden');
+                },
+                login: (e) => {
+                    e.preventDefault();
+                    const email = e.target.email.value;
+                    const password = e.target.password.value; // In real app, hash this
+
+                    // Admin Hardcoded Check
+                    if (email === 'admin@glowmart.com' && password === 'admin123') {
+                        app.state.user = { name: 'Admin', email: email, role: 'admin' };
+                        localStorage.setItem(DB_KEYS.SESSION, JSON.stringify(app.state.user));
+                        app.router.navigate('admin');
+                        app.ui.toast('Login Admin Berhasil');
+                        return;
+                    }
+
+                    const users = db.get(DB_KEYS.USERS);
+                    const user = users.find(u => u.email === email && u.password === password);
+                    
+                    if (user) {
+                        app.state.user = user;
+                        localStorage.setItem(DB_KEYS.SESSION, JSON.stringify(user));
+                        app.renderAccount();
+                        app.router.navigate('account');
+                        app.ui.toast('Selamat datang, ' + user.name);
+                    } else {
+                        app.ui.toast('Email atau password salah', 'error');
+                    }
+                },
+                register: (e) => {
+                    e.preventDefault();
+                    const name = e.target.name.value;
+                    const email = e.target.email.value;
+                    const password = e.target.password.value;
+
+                    const users = db.get(DB_KEYS.USERS);
+                    if (users.find(u => u.email === email)) return app.ui.toast('Email sudah terdaftar', 'error');
+
+                    const newUser = { name, email, password };
+                    users.push(newUser);
+                    db.save(DB_KEYS.USERS, users);
+                    app.ui.toast('Registrasi berhasil, silakan login');
+                    app.auth.toggleForm();
+                },
+                logout: () => {
+                    app.state.user = null;
+                    localStorage.removeItem(DB_KEYS.SESSION);
+                    app.router.navigate('home');
+                    app.ui.toast('Logout berhasil');
+                }
+            },
+
+            renderAccount: () => {
+                if (!app.state.user) {
+                    document.getElementById('auth-forms').classList.remove('hidden');
+                    document.getElementById('user-dashboard').classList.add('hidden');
+                } else {
+                    document.getElementById('auth-forms').classList.add('hidden');
+                    document.getElementById('user-dashboard').classList.remove('hidden');
+                    document.getElementById('user-name-display').innerText = app.state.user.name;
+                    document.getElementById('user-email-display').innerText = app.state.user.email;
+                    document.getElementById('user-avatar').innerText = app.state.user.name.charAt(0).toUpperCase();
+                    app.renderOrderHistory();
+                }
+            },
+
+            renderOrderHistory: () => {
+                if (!app.state.user) return;
+                const allOrders = db.get(DB_KEYS.ORDERS);
+                const userOrders = allOrders.filter(o => o.userId === app.state.user.email);
+                
+                const container = document.getElementById('order-history-list');
+                if (userOrders.length === 0) {
+                    container.innerHTML = '<p class="text-sm text-light">Belum ada pesanan.</p>';
+                    return;
+                }
+                
+                container.innerHTML = userOrders.map(o => `
+                    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #eee;">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-light">${o.id}</span>
+                            <span style="color: ${o.status === 'paid' ? 'var(--success)' : 'orange'}">${o.status.toUpperCase()}</span>
+                        </div>
+                        <div class="font-bold">Rp ${o.total.toLocaleString('id-ID')}</div>
+                        <div class="text-xs text-light mt-1">${new Date(o.date).toLocaleDateString()}</div>
+                    </div>
+                `).join('');
+            },
+
+            // --- LOGIC: ADMIN PANEL ---
+            admin: {
+                switchTab: (tab) => {
+                    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+                    event.target.classList.add('active');
+                    if (tab === 'products') {
+                        document.getElementById('admin-products-tab').classList.remove('hidden');
+                        document.getElementById('admin-orders-tab').classList.add('hidden');
+                        app.admin.renderProducts();
+                    } else {
+                        document.getElementById('admin-products-tab').classList.add('hidden');
+                        document.getElementById('admin-orders-tab').classList.remove('hidden');
+                        app.admin.renderOrders();
+                    }
+                },
+                renderProducts: () => {
+                    const list = db.get(DB_KEYS.PRODUCTS);
+                    document.getElementById('admin-product-list').innerHTML = list.map(p => `
+                        <tr>
+                            <td>${p.name}<br><span class="text-xs text-light">${p.category}</span></td>
+                            <td>${p.price}</td>
+                            <td>${p.stock}</td>
+                            <td>
+                                <button onclick="app.admin.editProduct(${p.id})" style="color:blue; border:none; background:none; cursor:pointer;">Edit</button> | 
+                                <button onclick="app.admin.deleteProduct(${p.id})" style="color:red; border:none; background:none; cursor:pointer;">Hapus</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                },
+                renderOrders: () => {
+                    const list = db.get(DB_KEYS.ORDERS);
+                    document.getElementById('admin-order-list').innerHTML = list.map(o => `
+                        <tr>
+                            <td><span class="text-xs">${o.id}</span></td>
+                            <td>${o.customer.name}</td>
+                            <td>${o.total}</td>
+                            <td><span style="padding:2px 6px; border-radius:4px; background:${o.status==='paid'?'#d4edda':'#fff3cd'}">${o.status}</span></td>
+                            <td>
+                                ${o.status === 'pending' ? `<button onclick="app.admin.setPaid('${o.id}')" style="cursor:pointer">Set Paid</button>` : '-'}
+                            </td>
+                        </tr>
+                    `).join('');
+                },
+                openProductModal: (product = null) => {
+                    document.getElementById('modal-product-title').innerText = product ? 'Edit Produk' : 'Tambah Produk';
+                    document.getElementById('p-id').value = product ? product.id : '';
+                    document.getElementById('p-name').value = product ? product.name : '';
+                    document.getElementById('p-cat').value = product ? product.category : 'Face Wash';
+                    document.getElementById('p-price').value = product ? product.price : '';
+                    document.getElementById('p-stock').value = product ? product.stock : '';
+                    app.ui.openModal('modal-product');
+                },
+                saveProduct: (e) => {
+                    e.preventDefault();
+                    const id = document.getElementById('p-id').value;
+                    const product = {
+                        id: id ? parseInt(id) : null,
+                        name: document.getElementById('p-name').value,
+                        category: document.getElementById('p-cat').value,
+                        price: parseInt(document.getElementById('p-price').value),
+                        stock: parseInt(document.getElementById('p-stock').value),
+                    };
+                    
+                    if (id) db.updateProduct(product);
+                    else db.addProduct(product);
+                    
+                    app.ui.closeModal('modal-product');
+                    app.admin.renderProducts();
+                    app.renderProducts(); // Update home view too
+                    app.ui.toast('Produk tersimpan');
+                },
+                editProduct: (id) => {
+                    const p = db.get(DB_KEYS.PRODUCTS).find(x => x.id === id);
+                    app.admin.openProductModal(p);
+                },
+                deleteProduct: (id) => {
+                    if(confirm('Yakin hapus produk ini?')) {
+                        db.deleteProduct(id);
+                        app.admin.renderProducts();
+                        app.renderProducts();
+                        app.ui.toast('Produk dihapus');
+                    }
+                },
+                setPaid: (id) => {
+                    db.updateOrderStatus(id, 'paid');
+                    app.admin.renderOrders();
+                    app.ui.toast('Status diupdate ke Paid');
+                }
+            },
+
+            // --- UTILS: UI & ROUTER ---
+            ui: {
+                toast: (msg, type = 'success') => {
+                    const container = document.getElementById('toast-container');
+                    const el = document.createElement('div');
+                    el.className = `toast ${type}`;
+                    el.innerHTML = `<span>${msg}</span>`;
+                    container.appendChild(el);
+                    setTimeout(() => el.remove(), 3000);
+                },
+                openModal: (id) => {
+                    document.getElementById(id).classList.add('active');
+                },
+                closeModal: (id) => {
+                    document.getElementById(id).classList.remove('active');
+                }
+            },
+
+            router: {
+                init: () => {
+                    app.router.navigate('home');
+                },
+                navigate: (viewName) => {
+                    // Hide all views
+                    document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+                    
+                    // Show target
+                    const target = document.getElementById(`view-${viewName}`);
+                    if(target) target.classList.remove('hidden');
+
+                    // Logic per view
+                    if (viewName === 'cart') app.renderCartItems();
+                    if (viewName === 'checkout') {
+                        document.getElementById('co-subtotal').innerText = document.getElementById('cart-total').innerText;
+                        app.updateShippingCost();
+                        if(app.state.user) {
+                            document.getElementById('co-name').value = app.state.user.name;
+                        }
+                    }
+                    if (viewName === 'account') app.renderAccount();
+                    if (viewName === 'admin') {
+                        if (!app.state.user || app.state.user.role !== 'admin') {
+                            app.router.navigate('account');
+                            return;
+                        }
+                        app.admin.switchTab('products');
+                    }
+                    
+                    window.scrollTo(0,0);
+                }
+            }
+        };
+
+        // Start App
+        document.addEventListener('DOMContentLoaded', app.init);
+
+    </script>
+</body>
+</html>
